@@ -1,9 +1,9 @@
 {
-    kingdom: "Duplodnaviria",
-    phylum: "Heunggongvirae",
-    class: "Herviviricetes",
-    order: "Herpesvirales",
-    family: "Orthoherpesviridae",
-    genus: "Lymphocryptovirus",
-    species: "humangamma4"
+    "kingdom": "Duplodnaviria",
+    "phylum": "Heunggongvirae",
+    "class": "Herviviricetes",
+    "order": "Herpesvirales",
+    "family": "Orthoherpesviridae",
+    "genus": "Lymphocryptovirus",
+    "species": "humangamma4"
 }

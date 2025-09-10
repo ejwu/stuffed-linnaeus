@@ -1,0 +1,129 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: #f0f0f0;
+}
+
+.mobile-container {
+  padding-top: 20px;
+  perspective: 1000px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+li > ul {
+  margin-top: 20px;
+}
+
+li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  margin: 0 20px;
+}
+
+li:only-child {
+  margin: 0;
+}
+
+/* Vertical line going UP from a UL to its parent element */
+li > ul::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: calc(50% - 0.5px);
+  width: 1px;
+  height: 20px;
+  background: #333;
+}
+
+/* Horizontal line connecting siblings */
+li > ul::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  height: 1px;
+  background: #333;
+  left: 25%;
+  right: 25%;
+}
+
+li > ul:has(> li:only-child)::after {
+  content: none;
+}
+
+/* Vertical line going DOWN from the horizontal bar to an element */
+li > ul > li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(50% - 0.5px);
+  width: 1px;
+  height: 21px; /* Add 1px for overlap */
+  background: #333;
+}
+
+.mobile-element {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  transform-style: preserve-3d;
+  border: 1px solid #333;
+  background-color: #fff;
+  margin-top: 20px;
+  animation: rotate 10s infinite linear;
+}
+
+.mobile-container > ul > li > .mobile-element {
+  margin-top: 0;
+}
+
+.mobile-element.speed-1 {
+  animation-duration: 9s;
+}
+
+.mobile-element.speed-2 {
+  animation-duration: 11s;
+}
+
+.front, .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backface-visibility: hidden;
+}
+
+.back {
+  transform: rotateY(180deg);
+}
+
+.back img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}

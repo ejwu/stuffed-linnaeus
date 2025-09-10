@@ -51,18 +51,27 @@ li > ul::before {
 }
 
 /* Horizontal line connecting siblings */
-li > ul::after {
+li > ul > li:not(:only-child)::after {
   content: '';
   position: absolute;
   top: 0;
   height: 1px;
   background: #333;
-  left: 25%;
-  right: 25%;
 }
 
-li > ul:has(> li:only-child)::after {
-  content: none;
+li > ul > li:first-child:not(:only-child)::after {
+  left: 50%;
+  width: calc(50% + 20px); /* Extend into the right margin */
+}
+
+li > ul > li:last-child:not(:only-child)::after {
+  left: -20px; /* Extend into the left margin */
+  width: calc(50% + 20px);
+}
+
+li > ul > li:not(:first-child):not(:last-child):not(:only-child)::after {
+  left: -20px; /* Extend into both margins */
+  width: calc(100% + 40px);
 }
 
 /* Vertical line going DOWN from the horizontal bar to an element */

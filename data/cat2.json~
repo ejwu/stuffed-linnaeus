@@ -1,9 +1,0 @@
-{
-    kingdom: "Animalia",
-    phylum: "Chordata",
-    class: "Mammalia",
-    order: "Carnivora",
-    family: "Felidae",
-    genus: "Felis",
-    species: "catus"
-}

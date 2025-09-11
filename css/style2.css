@@ -96,6 +96,11 @@ li > ul > li::before {
   animation: rotate 10s infinite linear;
 }
 
+.mobile-element.highlighted {
+  outline: 3px solid red;
+  outline-offset: 2px;
+}
+
 .mobile-container > ul > li > .mobile-element {
   margin-top: 0;
 }
@@ -135,4 +140,53 @@ li > ul > li::before {
   to {
     transform: rotateY(360deg);
   }
+}
+
+.infobox {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 600px;
+  height: 300px;
+  background-color: white;
+  border: 2px solid black;
+  z-index: 100;
+  display: none; /* Hidden by default */
+  padding: 10px;
+}
+
+.infobox-close {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.infobox-content {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+}
+
+.infobox-item {
+  width: 250px;
+  height: 250px;
+  border: 1px solid #ccc;
+  position: relative;
+}
+
+.collage-grid {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.collage-grid > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }

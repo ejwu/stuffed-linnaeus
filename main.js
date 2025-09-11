@@ -14,39 +14,79 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function createMobileElement(nodeData, imageUrl = null) {
+    function createMobileElement(nodeData) {
         const mobileElement = document.createElement('div');
         mobileElement.classList.add('mobile-element');
 
-        // Randomize rotation speed within 10% of 10 seconds (9s to 11s)
-        const baseDuration = 10; // seconds
-        const randomFactor = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
+        // Estimate width based on character count.
+        const charCount = nodeData.name.length;
+        const estimatedWidth = charCount * 8 + 40; // Adjusted for padding
+        const finalWidth = Math.max(100, estimatedWidth);
+
+        mobileElement.style.width = `${finalWidth}px`;
+
+        // Randomize rotation speed
+        const baseDuration = 10;
+        const randomFactor = 0.9 + Math.random() * 0.2;
         const randomDuration = baseDuration * randomFactor;
         mobileElement.style.animationDuration = `${randomDuration}s`;
 
         const front = document.createElement('div');
         front.classList.add('front');
-        const label = document.createElement('div');
-        label.classList.add('label');
-        label.textContent = nodeData.name;
-        front.appendChild(label);
+        front.style.padding = '0 10px';
+        front.style.display = 'flex';
+        front.style.flexDirection = 'column';
+        front.style.justifyContent = 'center';
+        front.style.alignItems = 'center';
+
+        if (nodeData.frontImageUrl) {
+            const img = document.createElement('img');
+            img.src = nodeData.frontImageUrl;
+            img.alt = nodeData.name;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            front.appendChild(img);
+        } else {
+            const label = document.createElement('div');
+            label.classList.add('label');
+            label.textContent = nodeData.name;
+            label.style.whiteSpace = 'nowrap';
+            front.appendChild(label);
+
+            if (nodeData.backImageUrl && nodeData.level === 'species') {
+                const baseFilename = nodeData.backImageUrl.split('/').pop().split('.').slice(0, -1).join('.');
+                const filenameDiv = document.createElement('div');
+                filenameDiv.classList.add('filename');
+                filenameDiv.textContent = baseFilename;
+                filenameDiv.style.fontSize = '10px';
+                filenameDiv.style.color = '#888';
+                front.appendChild(filenameDiv);
+            }
+        }
+
         mobileElement.appendChild(front);
 
-        const back = document.createElement('div'); // Create back div unconditionally
+        const back = document.createElement('div');
         back.classList.add('back');
+        back.style.padding = '0 10px';
 
-        if (imageUrl) {
+        if (nodeData.backImageUrl) {
             const img = document.createElement('img');
-            img.src = imageUrl;
+            img.src = nodeData.backImageUrl;
             img.alt = nodeData.name;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
             back.appendChild(img);
         } else {
             const pictureText = document.createElement('div');
-            pictureText.classList.add('picture-text'); // Add a class for styling if needed
+            pictureText.classList.add('picture-text');
             pictureText.textContent = "picture";
+            pictureText.style.whiteSpace = 'nowrap';
             back.appendChild(pictureText);
         }
-        mobileElement.appendChild(back); // Append back div unconditionally
+        mobileElement.appendChild(back);
 
         return mobileElement;
     }
@@ -59,12 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const li = document.createElement('li');
         li.classList.add('node', nodeData.level);
 
-        let imageUrl = null;
-        if (nodeData.isBottomNode && nodeData.image) {
-            imageUrl = nodeData.image;
-        }
-
-        const mobileElement = createMobileElement(nodeData, imageUrl);
+        const mobileElement = createMobileElement(nodeData);
         li.appendChild(mobileElement);
 
         if (nodeData.children && nodeData.children.length > 0) {
@@ -82,66 +117,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function initializeMobile() {
-        const jsonFiles = ['cat.json', 'cat2.json', 'mono.json']; // List of your JSON files
-        const allNodes = {}; // To store all nodes by level and name for coalescing
+        const jsonFiles = ["cat.json", "cat2.json", "mono.json", "camel.json", "great_horned_owl.json", "greater_flamingo.json", "short_beaked_echidna.json"];
+        
+        const domainNodeData = {
+            name: "Domain",
+            level: "domain",
+            children: [],
+            frontImageUrl: "data/linnaeus.jpg",
+            backImageUrl: "data/stuffed_linnaeus.jpeg"
+        };
 
-        // Define the taxonomic levels in order
         const taxonomicLevels = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'];
 
         for (const filename of jsonFiles) {
             const data = await fetchData(filename);
-            if (data) {
-                let currentParent = allNodes; // Start from the root of our combined structure
-                let lastNode = null; // To keep track of the deepest node in the current lineage
+            if (!data) continue;
 
-                // Extract the base name of the JSON file for image association
-                const baseFilename = filename.split('.')[0];
-                const imagePath = `data/${baseFilename}.jpg`;
+            let currentNode = domainNodeData;
+            const baseFilename = filename.split('.')[0];
+            const imagePath = `data/${baseFilename}.jpg`;
 
-                for (const level of taxonomicLevels) {
-                    if (data[level]) {
-                        const nodeName = data[level];
-                        if (!currentParent[level]) {
-                            currentParent[level] = {};
-                        }
-                        if (!currentParent[level][nodeName]) {
-                            currentParent[level][nodeName] = {
-                                name: nodeName,
-                                level: level,
-                                children: []
-                            };
-                        }
+            for (const level of taxonomicLevels) {
+                if (!data[level]) break; 
 
-                        // Link the current node to the previous level's children
-                        if (lastNode) {
-                            // Check if this child already exists to avoid duplicates
-                            if (!lastNode.children.some(child => child.name === nodeName && child.level === level)) {
-                                lastNode.children.push(currentParent[level][nodeName]);
-                            }
-                        }
-                        lastNode = currentParent[level][nodeName];
-                    }
+                const nodeName = data[level];
+                let childNode = currentNode.children.find(child => child.name === nodeName && child.level === level);
+
+                if (!childNode) {
+                    childNode = {
+                        name: nodeName,
+                        level: level,
+                        children: []
+                    };
+                    currentNode.children.push(childNode);
                 }
-                // Mark the last node of this lineage as a bottom node and assign the image
-                if (lastNode) {
-                    lastNode.isBottomNode = true;
-                    lastNode.image = imagePath;
-                }
+                currentNode = childNode;
             }
-        }
-
-        // Now, build the actual tree from the coalesced data
-        const domainNodeData = {
-            name: "Domain",
-            level: "domain",
-            children: []
-        };
-
-        // Populate the domain's children with the top-level nodes (kingdoms)
-        if (allNodes.kingdom) {
-            for (const kingdomName in allNodes.kingdom) {
-                domainNodeData.children.push(allNodes.kingdom[kingdomName]);
-            }
+            
+            currentNode.backImageUrl = imagePath;
         }
 
         const domainWrapper = document.createElement('li');
@@ -150,17 +163,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const domainMobileElement = createMobileElement(domainNodeData);
         domainWrapper.appendChild(domainMobileElement);
 
-        const ul = document.createElement('ul');
-        domainNodeData.children.forEach(childData => {
-            const childNode = buildTree(childData);
-            if (childNode) {
-                ul.appendChild(childNode);
-            }
-        });
-        domainWrapper.appendChild(ul);
+        if (domainNodeData.children.length > 0) {
+            const ul = document.createElement('ul');
+            domainNodeData.children.forEach(childData => {
+                const childNode = buildTree(childData);
+                if (childNode) {
+                    ul.appendChild(childNode);
+                }
+            });
+            domainWrapper.appendChild(ul);
+        }
 
         if (mobileContainer) {
-            mobileContainer.innerHTML = ''; // Clear existing content
+            mobileContainer.innerHTML = '';
             mobileContainer.appendChild(domainWrapper);
         } else {
             console.error('mobileContainer not found!');

@@ -54,6 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = document.getElementById('infobox-content');
         content.innerHTML = ''; // Clear previous content
 
+        // Reset infobox styles to default before applying new ones
+        infobox.style.height = '';
+        content.style.flexDirection = '';
+
         if (nodeData.level === 'domain') {
             infobox.style.height = '900px';
             content.style.flexDirection = 'column'; // Stack content vertically
@@ -123,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
             content.appendChild(bottomPart);
 
         } else { // For all other nodes
-            content.style.flexDirection = ''; // Reset to default (row)
             // Create front item
             const frontItem = document.createElement('div');
             frontItem.className = 'infobox-item';
@@ -139,7 +142,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 frontItem.style.flexDirection = 'column';
                 frontItem.style.justifyContent = 'center';
                 frontItem.style.alignItems = 'center';
+
+                // Add ancestor list
+                if (nodeData.parent) {
+                    const ancestors = [];
+                    let current = nodeData;
+                    while (current.parent && current.parent.level) {
+                        ancestors.unshift(current.parent);
+                        current = current.parent;
+                    }
+                    if (ancestors.length > 0 && ancestors[0].level === 'domain') {
+                        ancestors.shift();
+                    }
+
+                    if (ancestors.length > 0) {
+                        const ancestorList = document.createElement('div');
+                        ancestorList.className = 'ancestor-list';
+                        ancestors.forEach(ancestor => {
+                            if (nodeData.level === 'species' && ancestor.level === 'genus') {
+                                return; // Skip genus for species
+                            }
+                            const ancestorLine = document.createElement('div');
+                            const levelName = ancestor.level.charAt(0).toUpperCase() + ancestor.level.slice(1);
+                            ancestorLine.textContent = `${levelName}: ${ancestor.name}`;
+                            ancestorList.appendChild(ancestorLine);
+                        });
+                        frontItem.appendChild(ancestorList);
+                    }
+                }
+
+                if (nodeData.level !== 'species') {
+                    const levelLabel = document.createElement('div');
+                    levelLabel.className = 'infobox-level';
+                    const levelName = nodeData.level.charAt(0).toUpperCase() + nodeData.level.slice(1);
+                    levelLabel.textContent = levelName;
+                    frontItem.appendChild(levelLabel);
+                }
+
                 const label = document.createElement('div');
+                label.className = 'infobox-name';
                 if (nodeData.level === 'species' && nodeData.parent) {
                     label.textContent = `${nodeData.parent.name} ${nodeData.name}`;
                 } else {

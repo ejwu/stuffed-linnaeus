@@ -190,3 +190,21 @@ li > ul > li::before {
     height: 100%;
     object-fit: cover;
 }
+
+.ancestor-list {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 0.8em;
+    text-align: left;
+}
+
+.infobox-level {
+    font-size: 0.9em;
+    color: #555;
+}
+
+.infobox-name {
+    font-size: 1.2em;
+    font-weight: bold;
+}

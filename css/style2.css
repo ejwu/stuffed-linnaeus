@@ -9,6 +9,16 @@ body {
   background-color: #f0f0f0;
 }
 
+#gust-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 100;
+}
+
 .mobile-container {
   padding-top: 20px;
   perspective: 1000px;
@@ -93,7 +103,7 @@ li > ul > li::before {
   border: 1px solid #333;
   background-color: #fff;
   margin-top: 20px;
-  animation: rotate 10s infinite linear;
+  transform: rotateY(var(--rotation-angle, 0deg));
 }
 
 .mobile-element.highlighted {
@@ -103,14 +113,6 @@ li > ul > li::before {
 
 .mobile-container > ul > li > .mobile-element {
   margin-top: 0;
-}
-
-.mobile-element.speed-1 {
-  animation-duration: 9s;
-}
-
-.mobile-element.speed-2 {
-  animation-duration: 11s;
 }
 
 .front, .back {
@@ -131,15 +133,6 @@ li > ul > li::before {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotateY(0deg);
-  }
-  to {
-    transform: rotateY(360deg);
-  }
 }
 
 .infobox {

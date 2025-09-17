@@ -1,6 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
     const mobileContainer = document.querySelector('.mobile-container');
     let highlightedNode = null;
+    const animatedElements = []; // To store animation state
+    let lastTimestamp = 0;
+    let isGusting = false;
+
+
+    function animationLoop(timestamp) {
+        if (!lastTimestamp) {
+            lastTimestamp = timestamp;
+        }
+        let deltaTime = (timestamp - lastTimestamp) / 1000; // Time in seconds
+        lastTimestamp = timestamp;
+        // Cap delta time to prevent large jumps if the tab is inactive
+        if (deltaTime > 0.1) {
+            deltaTime = 0.1;
+        }
+
+        animatedElements.forEach(item => {
+            item.angle += item.currentSpeed * deltaTime;
+            item.element.style.transform = `rotateY(${item.angle}deg)`;
+        });
+
+        requestAnimationFrame(animationLoop);
+    }
+
 
     async function fetchData(filename) {
         try {
@@ -243,7 +267,13 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileElement.style.width = `${finalWidth}px`;
 
         const randomDuration = (9 + Math.random() * 2);
-        mobileElement.style.animationDuration = `${randomDuration}s`;
+        const degreesPerSecond = 360 / randomDuration;
+        animatedElements.push({
+            element: mobileElement,
+            angle: 0,
+            baseSpeed: degreesPerSecond,
+            currentSpeed: degreesPerSecond,
+        });
 
         const front = document.createElement('div');
         front.classList.add('front');
@@ -437,7 +467,54 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             console.error('mobileContainer not found!');
         }
+
+        requestAnimationFrame(animationLoop);
     }
 
     initializeMobile();
+
+    const gustButton = document.getElementById('gust-button');
+
+    gustButton.addEventListener('click', () => {
+        if (isGusting) {
+            return;
+        }
+        isGusting = true;
+
+        const fastSpeedMultiplier = 10;
+        const fastSpeedDuration = 1000; // ms
+        const decayDuration = 2000; // ms
+        const decayInterval = 100; // ms
+        const decaySteps = decayDuration / decayInterval;
+
+        // Speed up
+        animatedElements.forEach(item => {
+            item.currentSpeed = item.baseSpeed * fastSpeedMultiplier;
+        });
+
+        // Start decay after a delay
+        setTimeout(() => {
+            let currentStep = 0;
+            const decayIntervalId = setInterval(() => {
+                currentStep++;
+
+                if (currentStep > decaySteps) {
+                    clearInterval(decayIntervalId);
+                    animatedElements.forEach(item => {
+                        item.currentSpeed = item.baseSpeed; // Reset to base speed
+                    });
+                    isGusting = false;
+                    return;
+                }
+
+                const decayProgress = currentStep / decaySteps;
+                
+                animatedElements.forEach(item => {
+                    const fastSpeed = item.baseSpeed * fastSpeedMultiplier;
+                    item.currentSpeed = fastSpeed - (fastSpeed - item.baseSpeed) * decayProgress;
+                });
+
+            }, decayInterval);
+        }, fastSpeedDuration);
+    });
 });

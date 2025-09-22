@@ -3,9 +3,7 @@
     "phylum": "Chordata",
     "class": "Amphibia",
     "order": "Urodela",
-    "family": "Salamandridae",
-    "genus": "Salamandra",
-    "species": "gaudi",
-    "nickname": "El Drac",
-    "legendary": "true"
+    "family": "Ambystomatidae",
+    "genus": "Ambystoma",
+    "species": "mexicanum"
 }

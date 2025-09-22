@@ -503,6 +503,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const gustButton = document.getElementById('gust-button');
 
+    gustButton.textContent = ''; // Clear the text
+    const windheadImage = new Image();
+    windheadImage.onload = function() {
+        gustButton.style.width = this.naturalWidth + 'px';
+        gustButton.style.height = this.naturalHeight + 'px';
+    }
+    windheadImage.src = 'data/windhead.png';
+
     gustButton.addEventListener('click', () => {
         if (isGusting) {
             return;

@@ -15,10 +15,13 @@ body {
   position: fixed;
   top: 20px;
   right: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  z-index: 100;
+  cursor: default; /* Make it not obviously clickable */
+  z-index: 0;
+  border: none;
+  background-color: transparent;
+  background-image: url('../data/windhead.png');
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .mobile-container {
@@ -26,6 +29,8 @@ body {
   perspective: 1000px;
   white-space: nowrap; /* Prevent wrapping of inline-block elements */
   position: relative; /* Ensure it's a positioning context */
+  z-index: 1;
+  pointer-events: none;
 }
 
 ul {
@@ -34,6 +39,7 @@ ul {
   margin: 0;
   position: relative;
   display: inline-flex; /* Use inline-flex to respect min-width */
+  pointer-events: none;
 }
 
 li > ul {
@@ -107,6 +113,7 @@ li > ul > li::before {
   background-color: #fff;
   margin-top: 20px;
   transform: rotateY(var(--rotation-angle, 0deg));
+  pointer-events: auto; /* Re-enable pointer events for the interactive elements */
 }
 
 .mobile-element.legendary {

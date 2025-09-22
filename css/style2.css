@@ -7,6 +7,8 @@
 body {
   font-family: sans-serif;
   background-color: #f0f0f0;
+  margin: 20px 0; /* Add top and bottom margin */
+  overflow-x: auto; /* Enable horizontal scrolling on the body */
 }
 
 #gust-button {
@@ -22,6 +24,8 @@ body {
 .mobile-container {
   padding-top: 20px;
   perspective: 1000px;
+  white-space: nowrap; /* Prevent wrapping of inline-block elements */
+  position: relative; /* Ensure it's a positioning context */
 }
 
 ul {
@@ -29,8 +33,7 @@ ul {
   padding: 0;
   margin: 0;
   position: relative;
-  display: flex;
-  justify-content: center;
+  display: inline-flex; /* Use inline-flex to respect min-width */
 }
 
 li > ul {
@@ -106,6 +109,11 @@ li > ul > li::before {
   transform: rotateY(var(--rotation-angle, 0deg));
 }
 
+.mobile-element.legendary {
+    border-width: 3px;
+    border-style: dashed;
+}
+
 .mobile-element.highlighted {
   outline: 3px solid red;
   outline-offset: 2px;
@@ -146,6 +154,10 @@ li > ul > li::before {
   z-index: 100;
   display: none; /* Hidden by default */
   padding: 10px;
+}
+
+.infobox.legendary {
+    border: 3px dashed #333;
 }
 
 .infobox-close {
@@ -200,4 +212,18 @@ li > ul > li::before {
 .infobox-name {
     font-size: 1.2em;
     font-weight: bold;
+}
+
+.infobox-common-name {
+    margin-top: 10px;
+    font-style: italic;
+    font-size: 1em;
+    color: #333;
+}
+
+.mobile-common-name {
+    margin-top: 5px;
+    font-style: italic;
+    font-size: 0.8em;
+    color: #333;
 }

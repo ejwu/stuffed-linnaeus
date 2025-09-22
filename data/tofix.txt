@@ -1,2 +1,5 @@
 echidna
 flamingo
+common_cold
+gaudi_lizard
+pika

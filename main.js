@@ -79,8 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
         content.innerHTML = ''; // Clear previous content
 
         // Reset infobox styles to default before applying new ones
+        infobox.classList.remove('legendary');
         infobox.style.height = '';
         content.style.flexDirection = '';
+        
+        if (nodeData.legendary) {
+            infobox.classList.add('legendary');
+        }
 
         if (nodeData.level === 'domain') {
             infobox.style.height = '900px';
@@ -219,6 +224,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     filenameDiv.style.color = '#888';
                     frontItem.appendChild(filenameDiv);
                 }
+                if (nodeData.level === 'species' && nodeData.commonName) {
+                    const commonNameDiv = document.createElement('div');
+                    commonNameDiv.className = 'infobox-common-name';
+                    commonNameDiv.textContent = `"${nodeData.commonName}"`;
+                    frontItem.appendChild(commonNameDiv);
+                }
             }
 
             // Create back item
@@ -260,6 +271,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function createMobileElement(nodeData) {
         const mobileElement = document.createElement('div');
         mobileElement.classList.add('mobile-element');
+
+        if (nodeData.level === 'species' && nodeData.legendary) {
+            mobileElement.classList.add('legendary');
+        }
 
         const charCount = nodeData.name.length;
         const estimatedWidth = charCount * 8 + 40;
@@ -306,6 +321,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 filenameDiv.style.fontSize = '10px';
                 filenameDiv.style.color = '#888';
                 front.appendChild(filenameDiv);
+            }
+            if (nodeData.level === 'species' && nodeData.commonName) {
+                const commonNameDiv = document.createElement('div');
+                commonNameDiv.className = 'mobile-common-name';
+                commonNameDiv.textContent = `"${nodeData.commonName}"`;
+                front.appendChild(commonNameDiv);
             }
         }
 
@@ -401,8 +422,13 @@ document.addEventListener('DOMContentLoaded', () => {
     async function initializeMobile() {
         createInfobox(); // Create the infobox structure on startup
 
-        const jsonFiles = ["cat.json", "cat2.json", "mono.json", "camel.json", "great_horned_owl.json", "greater_flamingo.json", "short_beaked_echidna.json"];
-        
+        const jsonFiles = [
+            "cat.json", "cat2.json", "emu.json", "mono.json", "pika.json", "camel.json",
+            "axolotl.json", "manatee.json", "platypus.json", "common_cold.json",
+            "gaudi_lizard.json", "giant_isopod.json", "ringtail_cat.json",
+            "great_horned_owl.json", "greater_flamingo.json", "short_beaked_echidna.json"
+        ];
+
         const domainNodeData = {
             name: "Domain",
             level: "domain",
@@ -418,11 +444,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!data) continue;
 
             let currentNode = domainNodeData;
-            const baseFilename = filename.split('.')[0];
+            const baseFilename = filename.split('.').slice(0, -1).join('.');
             const imagePath = `data/${baseFilename}.jpg`;
 
             for (const level of taxonomicLevels) {
-                if (!data[level]) break; 
+                if (!data[level]) break;
 
                 const nodeName = data[level];
                 let childNode = currentNode.children.find(child => child.name === nodeName && child.level === level);
@@ -438,32 +464,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 currentNode = childNode;
             }
-            
+
             currentNode.backImageUrl = imagePath;
+            if (data.legendary) {
+                currentNode.legendary = true;
+            }
+            if (data.name) {
+                currentNode.commonName = data.name;
+            }
         }
 
         collectAndAssignDescendantImages(domainNodeData);
 
-        const domainWrapper = document.createElement('li');
-        domainWrapper.classList.add('node', 'domain');
-
-        const domainMobileElement = createMobileElement(domainNodeData);
-        domainWrapper.appendChild(domainMobileElement);
-
-        if (domainNodeData.children.length > 0) {
-            const ul = document.createElement('ul');
-            domainNodeData.children.forEach(childData => {
-                const childNode = buildTree(childData);
-                if (childNode) {
-                    ul.appendChild(childNode);
-                }
-            });
-            domainWrapper.appendChild(ul);
-        }
+        const rootUl = document.createElement('ul');
+        const domainWrapper = buildTree(domainNodeData);
+        rootUl.appendChild(domainWrapper);
 
         if (mobileContainer) {
             mobileContainer.innerHTML = '';
-            mobileContainer.appendChild(domainWrapper);
+            mobileContainer.appendChild(rootUl);
+            // Use a small timeout to allow the browser to render the elements before measuring.
+            setTimeout(() => {
+                if(rootUl.offsetWidth > mobileContainer.clientWidth) {
+                    rootUl.style.margin = '0';
+                }
+                else {
+                    rootUl.style.margin = '0 auto';
+                }
+            }, 100);
         } else {
             console.error('mobileContainer not found!');
         }
